@@ -140,61 +140,61 @@ ORDER BY
 	E.ccode, E.term
 ;
 
--- 11.
+-- 11.***
 SELECT
 	DISTINCT S.sid, S.sname
 FROM
---	student S INNER JOIN enroll E ON S.sid = 12345678 AND E.sid = 12345678
-	student S,
-	enroll E
+	student S INNER JOIN enroll E ON S.sid = 12345678 AND E.sid = 12345678
 WHERE
 	S.sid != 12345678
-	AND E.ccode IN(
-		SELECT ccode FROM course WHERE dept = 'computer science' )
-	AND E.ccode IN(
-		SELECT ccode FROM enroll WHERE sid = 12345678 )
-	AND E.term IN(
-		SELECT term FROM enroll WHERE term )
 ORDER BY
 	S.sid
 ;
-/*
+
 -- 12.
 SELECT
-	
+	COUNT(DISTINCT S.sid) AS numstudents
 FROM
-	
-WHERE
-	
+	student S
 ;
 
 -- 13.
 SELECT
-	
+	COUNT(DISTINCT E.sid) AS numstudents
 FROM
-	
+	enroll E
 WHERE
-	
+	E.term = 'winter 2018'
 ;
 
 -- 14.
 SELECT
-	
+	C.dept, COUNT(DISTINCT C.ccode) AS numcourses
 FROM
-	
-WHERE
-	
+	course C
+GROUP BY
+	C.dept
+ORDER BY
+	numcourses DESC,
+	C.dept ASC
 ;
 
--- 15.
+-- 15.***
 SELECT
-	
+	DISTINCT C.ccode, C.credits
 FROM
-	
+--	course C INNER JOIN courseoffer CO ON C.ccode = CO.ccode
+	course C, courseoffer CO, enroll E
 WHERE
-	
+	C.ccode = CO.ccode AND CO.ccode = E.ccode AND CO.term = 'winter 2018' AND E.term = 'winter 2018'
+	AND E.ccode IN(
+		SELECT ccode, COUNT(sid) AS numenroll FROM enroll WHERE numenroll > 5 GROUP BY ccode)
+GROUP BY
+	E.ccode
+ORDER BY
+	C.ccode
 ;
-
+/*
 -- 16.
 SELECT
 	
