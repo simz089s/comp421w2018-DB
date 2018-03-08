@@ -49,7 +49,7 @@ WHERE
 ORDER BY
 	C.ccode
 ;
-
+/*
 -- 4.5.
 SELECT
 	C.ccode, C.credits
@@ -63,7 +63,7 @@ WHERE
 		WHERE CO.term = 'winter 2018' AND CO.ccode = C.ccode )
 ORDER BY
 	C.ccode
-;
+;*/
 
 -- 5.
 SELECT
@@ -101,43 +101,64 @@ ORDER BY
 
 -- 8.
 SELECT
-	DISTINCT C.ccode, C.credits
+	/*DISTINCT */C.ccode, C.credits
 FROM
-	course C, enroll E
+	course C,
+	enroll E1 INNER JOIN enroll E2 ON
+		E1.term = 'winter 2018'
+		AND E2.term = 'winter 2018'
+		AND E1.sid = 12345678
+		AND E2.sid = 12345679
+		AND E1.ccode = E2.ccode
 WHERE
-	C.ccode = E.ccode AND E.term = 'winter 2018' AND E.sid IN(
-		SELECT sid FROM enroll WHERE sid = 12345678 AND sid = 12345679 )
+	C.ccode = E1.ccode--OR C.ccode = E2.ccode
 ORDER BY
 	C.ccode
 ;
-/*
+
 -- 9.
 SELECT
-	
+	/*DISTINCT */C.ccode, C.credits
 FROM
-	
+	course C, enroll E
 WHERE
-	
+	C.ccode = E.ccode AND E.term = 'winter 2018' AND E.sid = 12345678 AND E.ccode NOT IN(
+		SELECT ccode FROM enroll WHERE sid = 12345679 )
+ORDER BY
+	C.ccode
 ;
 
 -- 10.
 SELECT
-	
+	E.ccode, E.term, E.grade
 FROM
-	
+	enroll E
 WHERE
-	
+	E.sid = 12345678 AND E.ccode IN(
+		SELECT ccode FROM course WHERE dept = 'computer science' )
+ORDER BY
+	E.ccode, E.term
 ;
 
 -- 11.
 SELECT
-	
+	DISTINCT S.sid, S.sname
 FROM
-	
+--	student S INNER JOIN enroll E ON S.sid = 12345678 AND E.sid = 12345678
+	student S,
+	enroll E
 WHERE
-	
+	S.sid != 12345678
+	AND E.ccode IN(
+		SELECT ccode FROM course WHERE dept = 'computer science' )
+	AND E.ccode IN(
+		SELECT ccode FROM enroll WHERE sid = 12345678 )
+	AND E.term IN(
+		SELECT term FROM enroll WHERE term )
+ORDER BY
+	S.sid
 ;
-
+/*
 -- 12.
 SELECT
 	
