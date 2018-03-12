@@ -103,14 +103,15 @@ ORDER BY
 
 -- 9.
 SELECT
-	/*DISTINCT */C.ccode, C.credits
+	DISTINCT C.ccode, C.credits
 FROM
 	course C, enroll E
 WHERE
-	C.ccode = E.ccode AND E.term = 'winter 2018' AND E.sid = 12345678 AND E.ccode NOT IN(
-		SELECT ccode FROM enroll WHERE sid = 12345679 )
+	C.ccode = E.ccode AND E.term = 'winter 2018' AND E.sid = 12345678
+	EXCEPT(
+		SELECT E.ccode, C.credits FROM course C, enroll E WHERE C.ccode = E.ccode AND sid = 12345679 AND E.term = 'winter 2018' )
 ORDER BY
-	C.ccode
+	1
 ;
 
 -- 10.
@@ -119,8 +120,8 @@ SELECT
 FROM
 	enroll E
 WHERE
-	E.sid = 12345678 AND E.ccode IN(
-		SELECT ccode FROM course WHERE dept = 'computer science' )
+	E.sid = 12345678 AND EXISTS(
+		SELECT C.ccode FROM course C WHERE C.dept = 'computer science' AND E.ccode = C.ccode )
 ORDER BY
 	E.ccode, E.term
 ;
@@ -174,21 +175,13 @@ ORDER BY
 SELECT
 	C.ccode, C.credits
 FROM
-	course C,
-	(SELECT
-		E.ccode
-	FROM
-		course C JOIN enroll E ON C.ccode = E.ccode
-	WHERE
-		E.term = 'winter 2018' AND C.dept = 'computer science'
-	GROUP BY
-		E.ccode
-	HAVING
-		count(*) >= 5) AS E
+	course C JOIN enroll E ON C.ccode = E.ccode
 WHERE
-	C.ccode = E.ccode
-ORDER BY
-	ccode
+	E.term = 'winter 2018' AND C.dept = 'computer science'
+GROUP BY
+	C.ccode
+HAVING
+	count(*) >= 5
 ;
 
 -- 16.
