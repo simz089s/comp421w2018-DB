@@ -179,20 +179,25 @@ ORDER BY
 	C.dept ASC
 ;
 
--- 15.***
+-- 15.
 SELECT
-	DISTINCT C.ccode, C.credits
+	C.ccode, C.credits
 FROM
---	course C INNER JOIN courseoffer CO ON C.ccode = CO.ccode
-	course C, courseoffer CO, enroll E
+	course C,
+	(SELECT
+		E.ccode
+	FROM
+		course C JOIN enroll E ON C.ccode = E.ccode
+	WHERE
+		E.term = 'winter 2018' AND C.dept = 'computer science'
+	GROUP BY
+		E.ccode
+	HAVING
+		count(*) >= 5) AS E
 WHERE
-	C.ccode = CO.ccode AND CO.ccode = E.ccode AND CO.term = 'winter 2018' AND E.term = 'winter 2018'
-	AND E.ccode IN(
-		SELECT ccode, COUNT(sid) AS numenroll FROM enroll WHERE numenroll > 5 GROUP BY ccode)
-GROUP BY
-	E.ccode
+	C.ccode = E.ccode
 ORDER BY
-	C.ccode
+	ccode
 ;
 
 -- 16.***
