@@ -202,14 +202,13 @@ ORDER BY
 
 -- 16.***
 SELECT
-	DISTINCT C.dept
+	C.dept
 FROM
-	course C, enroll E
-WHERE
-	E.sid IN(
-		SELECT sid FROM enroll WHERE term = 'winter 2018')
-	AND C.ccode IN(
-		SELECT ccode FROM enroll WHERE term = 'winter 2018')
+	course C INNER JOIN enroll E ON C.ccode = E.ccode AND E.term = 'winter 2018'
+GROUP BY
+	C.dept
+HAVING
+	count(DISTINCT E.sid) = (SELECT count(DISTINCT sid) FROM enroll WHERE term = 'winter 2018')
 ORDER BY
 	C.dept
 ;
