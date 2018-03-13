@@ -199,13 +199,17 @@ ORDER BY
 
 -- 17.
 SELECT
-	
+	ccode, count() AS numstudents
 FROM
 	
 WHERE
 	
+GROUP BY
+	
+ORDER BY
+	ccode
 ;
-/*
+
 -- 18.
 SELECT
 	
@@ -213,19 +217,20 @@ FROM
 	
 WHERE
 	
+ORDER BY
+	ccode
 ;
 
 -- 19.
 SELECT
-	S.rating, AVG( S.age )
+	avg("count") AS avgenrollment
 FROM
-	skaters S
-WHERE
-	S.age > 0
-GROUP BY
-	S.rating
-ORDER BY
-	S.rating DESC
+	(
+		SELECT count (DISTINCT E.sid)
+		FROM enroll E
+		WHERE E.term = 'winter 2018'
+		GROUP BY E.ccode
+	) AS cnt
 ;
 
 -- 20.
@@ -241,4 +246,3 @@ ORDER BY
 	
 ;
 
-*/
