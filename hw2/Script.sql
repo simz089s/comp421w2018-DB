@@ -86,7 +86,7 @@ ORDER BY
 
 -- 8.
 SELECT
-	/*DISTINCT */C.ccode, C.credits
+	DISTINCT C.ccode, C.credits
 FROM
 	course C,
 	enroll E1 INNER JOIN enroll E2 ON
