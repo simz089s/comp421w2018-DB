@@ -42,28 +42,13 @@ FROM
 	course C
 WHERE
 	C.dept = 'computer science'
-	AND C.ccode IN(
-		SELECT CO.ccode
-		FROM courseoffer CO
-		WHERE CO.term = 'winter 2018' )
-ORDER BY
-	C.ccode
-;
-/*
--- 4.5.
-SELECT
-	C.ccode, C.credits
-FROM
-	course C
-WHERE
-	C.dept = 'computer science'
 	AND EXISTS(
 		SELECT CO.ccode
 		FROM courseoffer CO
 		WHERE CO.term = 'winter 2018' AND CO.ccode = C.ccode )
 ORDER BY
 	C.ccode
-;*/
+;
 
 -- 5.
 SELECT
@@ -101,7 +86,7 @@ ORDER BY
 
 -- 8.
 SELECT
-	/*DISTINCT */C.ccode, C.credits
+	DISTINCT C.ccode, C.credits
 FROM
 	course C,
 	enroll E1 INNER JOIN enroll E2 ON
@@ -118,14 +103,15 @@ ORDER BY
 
 -- 9.
 SELECT
-	/*DISTINCT */C.ccode, C.credits
+	DISTINCT C.ccode, C.credits
 FROM
 	course C, enroll E
 WHERE
-	C.ccode = E.ccode AND E.term = 'winter 2018' AND E.sid = 12345678 AND E.ccode NOT IN(
-		SELECT ccode FROM enroll WHERE sid = 12345679 )
+	C.ccode = E.ccode AND E.term = 'winter 2018' AND E.sid = 12345678
+	EXCEPT(
+		SELECT E.ccode, C.credits FROM course C, enroll E WHERE C.ccode = E.ccode AND sid = 12345679 AND E.term = 'winter 2018' )
 ORDER BY
-	C.ccode
+	1
 ;
 
 -- 10.
@@ -134,19 +120,25 @@ SELECT
 FROM
 	enroll E
 WHERE
-	E.sid = 12345678 AND E.ccode IN(
-		SELECT ccode FROM course WHERE dept = 'computer science' )
+	E.sid = 12345678 AND EXISTS(
+		SELECT C.ccode FROM course C WHERE C.dept = 'computer science' AND E.ccode = C.ccode )
 ORDER BY
 	E.ccode, E.term
 ;
 
--- 11.***
+-- 11.
 SELECT
 	DISTINCT S.sid, S.sname
 FROM
-	student S INNER JOIN enroll E ON S.sid = 12345678 AND E.sid = 12345678
+	student S, enroll E1
 WHERE
-	S.sid != 12345678
+	S.sid = E1.sid
+	AND S.sid != 12345678
+	AND EXISTS(
+		SELECT *
+		FROM enroll E2
+		WHERE E2.sid = 12345678
+			AND E1.term = E2.term AND E1.ccode = E2.ccode)
 ORDER BY
 	S.sid
 ;
@@ -179,38 +171,43 @@ ORDER BY
 	C.dept ASC
 ;
 
--- 15.***
+-- 15.
 SELECT
-	DISTINCT C.ccode, C.credits
+	C.ccode, C.credits
 FROM
---	course C INNER JOIN courseoffer CO ON C.ccode = CO.ccode
-	course C, courseoffer CO, enroll E
+	course C JOIN enroll E ON C.ccode = E.ccode
 WHERE
-	C.ccode = CO.ccode AND CO.ccode = E.ccode AND CO.term = 'winter 2018' AND E.term = 'winter 2018'
-	AND E.ccode IN(
-		SELECT ccode, COUNT(sid) AS numenroll FROM enroll WHERE numenroll > 5 GROUP BY ccode)
+	E.term = 'winter 2018' AND C.dept = 'computer science'
 GROUP BY
-	E.ccode
-ORDER BY
 	C.ccode
+HAVING
+	count(*) >= 5
 ;
-/*
+
 -- 16.
 SELECT
-	
+	C.dept
 FROM
-	
-WHERE
-	
+	course C INNER JOIN enroll E ON C.ccode = E.ccode AND E.term = 'winter 2018'
+GROUP BY
+	C.dept
+HAVING
+	count(DISTINCT E.sid) = (SELECT count(DISTINCT sid) FROM enroll WHERE term = 'winter 2018')
+ORDER BY
+	C.dept
 ;
 
 -- 17.
 SELECT
-	
+	ccode, count() AS numstudents
 FROM
 	
 WHERE
 	
+GROUP BY
+	
+ORDER BY
+	ccode
 ;
 
 -- 18.
@@ -220,19 +217,20 @@ FROM
 	
 WHERE
 	
+ORDER BY
+	ccode
 ;
 
 -- 19.
 SELECT
-	S.rating, AVG( S.age )
+	avg("count") AS avgenrollment
 FROM
-	skaters S
-WHERE
-	S.age > 0
-GROUP BY
-	S.rating
-ORDER BY
-	S.rating DESC
+	(
+		SELECT count (DISTINCT E.sid)
+		FROM enroll E
+		WHERE E.term = 'winter 2018'
+		GROUP BY E.ccode
+	) AS cnt
 ;
 
 -- 20.
@@ -248,4 +246,3 @@ ORDER BY
 	
 ;
 
-*/
