@@ -182,6 +182,8 @@ GROUP BY
 	C.ccode
 HAVING
 	count(*) >= 5
+ORDER BY
+	C.ccode
 ;
 
 -- 16.
@@ -201,48 +203,47 @@ ORDER BY
 SELECT
 	ccode, count() AS numstudents
 FROM
-	
+
 WHERE
-	
+
 GROUP BY
-	
+
 ORDER BY
 	ccode
 ;
 
 -- 18.
 SELECT
-	
+
 FROM
-	
+
 WHERE
-	
+
 ORDER BY
 	ccode
 ;
 
 -- 19.
 SELECT
-	avg("count") AS avgenrollment
+	avg(cnt) AS avgenrollment
 FROM
 	(
-		SELECT count (DISTINCT E.sid)
+		SELECT count(DISTINCT E.sid) AS cnt
 		FROM enroll E
 		WHERE E.term = 'winter 2018'
 		GROUP BY E.ccode
-	) AS cnt
+	) AS CNT
 ;
 
 -- 20.
 SELECT
-	
-FROM
-	
-WHERE
-	
-GROUP BY
-	
-ORDER BY
-	
-;
 
+FROM
+
+WHERE
+
+GROUP BY
+
+ORDER BY
+
+;
