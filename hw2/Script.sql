@@ -201,13 +201,21 @@ ORDER BY
 
 -- 17.
 SELECT
-	ccode, count() AS numstudents
+	E.ccode, count(DISTINCT(E.sid, E.ccode)) AS numstudents
 FROM
-
-WHERE
-
+	enroll E INNER JOIN courseoffer CO ON E.ccode = CO.ccode AND E.term = 'winter 2018' AND CO.term = 'winter 2018'
 GROUP BY
-
+	E.ccode
+UNION
+SELECT
+	CO.ccode, 0
+FROM
+	courseoffer CO
+WHERE
+    CO.term = 'winter 2018'
+	AND CO.ccode NOT IN (SELECT E.ccode FROM enroll E INNER JOIN courseoffer CO ON E.ccode = CO.ccode AND E.term = 'winter 2018' AND CO.term = 'winter 2018')
+GROUP BY
+    CO.ccode
 ORDER BY
 	ccode
 ;
