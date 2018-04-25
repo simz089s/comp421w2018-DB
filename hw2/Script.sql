@@ -220,15 +220,19 @@ ORDER BY
 	ccode
 ;
 
+/* TODO */
 -- 18.
 SELECT
-
+	CO.ccode, COUNT(E.sid) AS numstudents
 FROM
-
+	enroll E RIGHT OUTER JOIN courseoffer CO
+		ON E.term = 'winter 2018' AND CO.term = 'winter 2018'
 WHERE
-
+	CO.term = 'winter 2018'
+GROUP BY
+	CO.ccode
 ORDER BY
-	ccode
+	CO.ccode
 ;
 
 -- 19.
@@ -245,13 +249,19 @@ FROM
 
 -- 20.
 SELECT
-
+	E.ccode, COUNT(E.sid) AS numstudents
 FROM
-
+	enroll E
 WHERE
-
+	E.term = 'winter 2018'
 GROUP BY
-
+	E.ccode
+HAVING
+	COUNT(E.sid) >= ALL(
+		SELECT COUNT(sid)
+		FROM enroll
+		WHERE term = 'winter 2018'
+		GROUP BY ccode)
 ORDER BY
-
+	E.ccode
 ;
